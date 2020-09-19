@@ -25,9 +25,9 @@ module.exports =  {
   // Verify request for authorization
   verifyReq: require('./verifyReq'),
 
-  // // Create a challenge JWS
-  // createChallenge: require('./createChallenge'),
-  //
+  // Create a challenge JWS
+  createChallenge: require('./createChallenge'),
+
   // // Sign a challenge JWS
   // createChallenge: require('./signChallenge'),
   //
