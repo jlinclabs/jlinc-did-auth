@@ -22,9 +22,9 @@ module.exports =  {
   // Create request for authorization
   request: require('./request'),
 
-  // // Verify request for authorization
-  // verifyReq: require('./verifyReq'),
-  //
+  // Verify request for authorization
+  verifyReq: require('./verifyReq'),
+
   // // Create a challenge JWS
   // createChallenge: require('./createChallenge'),
   //
