@@ -19,9 +19,9 @@ module.exports =  {
   // Create a nonce
   createNonce: require('./createNonce'),
 
-  // // Create request for authorization
-  // request: require('./request'),
-  //
+  // Create request for authorization
+  request: require('./request'),
+
   // // Verify request for authorization
   // verifyReq: require('./verifyReq'),
   //
