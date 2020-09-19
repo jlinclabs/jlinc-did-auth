@@ -23,7 +23,7 @@ module.exports = {
     "quotes": "off",
     "semi": ["error", "always"],
     "strict": [2, "global"],
-    "no-console": "error",
+    "no-console": "off",
     "no-unused-vars": "error",
     "space-before-function-paren": "off",
     "object-curly-spacing": "off",
