@@ -4,8 +4,6 @@ const jlincJwt = require('jlinc-jwt');
 const createNonce = require('./createNonce');
 
 module.exports = function(verifiedRequest, verifierKeys, verifierDid){
-  //const { JlincDidAuthError } = this;
-
   /*
     The challenge object encapsulated in the returned JWS is the request object, plus the
     verifier's DID, the challenge nonce and a challenge timestamp in iat format.
