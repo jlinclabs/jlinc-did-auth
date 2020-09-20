@@ -28,9 +28,15 @@ module.exports =  {
   // Create a challenge JWS
   createChallenge: require('./createChallenge'),
 
-  // // Sign a challenge JWS
-  // createChallenge: require('./signChallenge'),
-  //
-  // // Verify challenge signature and issue token
-  // createChallenge: require('./verifyChallenge'),
+  // Verify a challenge JWS
+  verifyChallenge: require('./verifyChallenge'),
+
+  // Sign a challenge JWS
+  signChallenge: require('./signChallenge'),
+
+  // Verify challenge signature
+  // verifyChallengeSignature: require('./verifyChallengeSignature'),
+
+  // Create authorization token JWS
+  // token: require('./token'),
 };
