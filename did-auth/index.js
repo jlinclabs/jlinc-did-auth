@@ -35,8 +35,6 @@ module.exports =  {
   signChallenge: require('./signChallenge'),
 
   // Verify challenge signature
-  // verifyChallengeSignature: require('./verifyChallengeSignature'),
+  verifyChallengeSignature: require('./verifyChallengeSignature'),
 
-  // Create authorization token JWS
-  // token: require('./token'),
 };
