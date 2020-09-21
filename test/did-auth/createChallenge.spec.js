@@ -36,7 +36,7 @@ describe('create challenge', function() {
     });
   });
 
-  context('when given invalid arguments', function(){
+  context('when given invalid verifiedRequest object', function(){
     it('should throw error', function(){
       expect(() => {
         auth.createChallenge();
@@ -44,7 +44,7 @@ describe('create challenge', function() {
     });
   });
 
-  context('when given invalid arguments', function(){
+  context('when given invalid public key', function(){
     it('should throw error', function(){
       expect(() => {
         auth.createChallenge(verifiedRequest);
@@ -52,7 +52,7 @@ describe('create challenge', function() {
     });
   });
 
-  context('when given invalid arguments', function(){
+  context('when given invalid private key', function(){
     it('should throw error', function(){
       expect(() => {
         auth.createChallenge(verifiedRequest, {signingPublicKey: 'XJVzCMAArF4YAhHLQgOv58TLxxDS2IFi-8iNfrxYsZQ'});
@@ -60,7 +60,7 @@ describe('create challenge', function() {
     });
   });
 
-  context('when given invalid arguments', function(){
+  context('when given no verifier DID', function(){
     it('should throw error', function(){
       expect(() => {
         auth.createChallenge(verifiedRequest, verifierKeys);
