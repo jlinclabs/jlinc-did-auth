@@ -14,7 +14,16 @@ as well as their own signing key to validate their JWS's.
 The ***verifier*** must have access to their own signing key for JWS validation.
 
 Both the ***agent*** and the ***verifier*** should keep a whitelist of acceptable counter-party's DIDs and
-associated public keys. 
+associated public keys.
+
+## Protocol
+1. The agent forms a request for authorization on behalf or the requester using #request and transmits the resulting JWS to the verifier's API endpoint.
+2. The verifier decodes and validates the request using #verifyReq. They check that the agent DID is whitelisted, and cache the authID with the requester DID.
+3. The verifier forms a challenge JWS using #createChallenge and transmits it to the agent's API endpoint.
+4. The agent decodes and validates the challenge using #verifyChallenge and checks that the authID and all DIDs are as expected.
+5. The agent then signs the resulting challengeObject using #signChallenge and and sends the requester to the verifier's authentication page with the signed challenge JWS.
+6. The verifier decodes and validates the signed challenge JWS using #verifyChallengeSignature, and inspects the resulting data object for the correct authID and DIDs. If all is well, the verifier authorizes the requester.
+
 
 ## Expected Usage
 given:
@@ -42,7 +51,7 @@ const auth = require('jlinc-did-auth');
   The authID is a UUID of v4 type.
 */
 
-auth.request({reqObject}) --> JWS
+auth.request(reqObject) --> JWS
 ```
 
 ### Verify request
@@ -54,14 +63,23 @@ auth.request({reqObject}) --> JWS
 auth.verifyReq(JWS) --> requestObject
 ```
 
-### Send challenge
+### Create challenge
 ```js
 /*
   The challenge object encapsulated in the returned JWS is the request object, plus the
   verifier's DID, the challenge nonce and a challenge timestamp in iat format.
   The JWS is signed with the verifier's DID signing key.
 */
-auth.challenge(requestObject) --> challengeJWS
+auth.createChallenge(verifiedRequestObject, verifierKeys, verifierDid) --> challengeJWS
+```
+
+### Verify challenge
+```js
+/*
+  Decode and verify the challenge.
+*/
+
+auth.verifyChallenge(challengeJWS) --> requestObject
 ```
 
 ### Sign challenge
@@ -70,16 +88,16 @@ auth.challenge(requestObject) --> challengeJWS
   The challenge object plus signature over the nonce, by the requester DID's signing key, in Base64URL format, and a signature timestamp.
   The JWS is once again signed by the originating agentDID.
 */
-auth.signChallenge(challengeJWS) --> signedChallengeJWS
+auth.signChallenge(challengeObject, requesterKeys, agentKeys) --> signedChallengeJWS
 ```
 
 
-### Verify challenge and issue token
+### Verify challenge signature
 ```js
 /*
   Verify the challenge signature, the JWS signature and format completeness.
-  Return the signed challenge object, and a unique auth token.
+  Return the signed challenge object.
 */
 
-auth.verifyChallenge(signedChallengeJWS) --> {decodedSignedCallengeObject, token}
+auth.verifyChallengeSignature(signedChallengeJWS) --> decodedSignedChallengeObject
 ```
