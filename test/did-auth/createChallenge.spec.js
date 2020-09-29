@@ -1,38 +1,62 @@
 'use strict';
 
-const auth = require('jlinc-did-auth');
 const jwt = require('jlinc-jwt');
-const isJWT = /^[\w-]+\.[\w-]+\.[\w-]+$/;
-const isTimestamp = /^[\d]{10,13}$/; //with or without milliseconds
-const isDid = /^did\:[a-z]+\:[\w\-]+$/;
-const isNonce = /^[a-f0-9]{64}$/;
-const validReqObject = {
-  agentAuthReqURL: 'http://localhost:8080',
-  agentDID: 'did:jlinc:mY5q2_qiJaaoQDMTdLj56tkP52iUxXg0pSb8u-S1iA0',
-  agentSigningKeys: {signingPublicKey: 'mY5q2_qiJaaoQDMTdLj56tkP52iUxXg0pSb8u-S1iA0',
-    signingPrivateKey: 'atlovbiCQUWv5lHkRohXluNvP69z6GXZ4dvAfBeTLUuZjmrb-qIlpqhAMxN0uPnq2Q_naJTFeDSlJvy75LWIDQ'},
-  requesterDID: 'did:jlinc:iC2FSXaxH8HmK8sA0O6G3ZBVXpwb3IA_XfrYQDwnGE8'
-};
-const reqJWS = auth.request(validReqObject);
-const verifiedRequest = auth.verifyReq(reqJWS);
-const verifierKeys = {
-  signingPublicKey: 'XJVzCMAArF4YAhHLQgOv58TLxxDS2IFi-8iNfrxYsZQ',
-  signingPrivateKey: 'KyyAayH9nn-QU22WTjI1KFIs9ujI9YmcMmduwUwtmBBclXMIwACsXhgCEctCA6_nxMvHENLYgWL7yI1-vFixlA'
-};
-const verifierDid = 'did:jlinc:XJVzCMAArF4YAhHLQgOv58TLxxDS2IFi-8iNfrxYsZQ';
+const {
+  generateVerifiedRequest,
+  generateActor,
+} = require('../helpers');
+const auth = require('../../');
 
-describe('create challenge', function() {
-
+describe('createChallenge', function() {
   context('when given a verified request, verifier keys, and verifier DID', function(){
-    const result = auth.createChallenge(verifiedRequest, verifierKeys, verifierDid);
     it('should return a verifiable JWT', function(){
-      expect(isJWT.test(result)).to.be.true;
-      const verified = jwt.verifyEdDsa(result);
-      expect(verified).to.be.an('object');
-      expect(Object.keys(verified.payload)).to.have.lengthOf(9);
-      expect(isNonce.test(verified.payload.challenge)).to.be.true;
-      expect(isTimestamp.test(verified.payload.challengeIat)).to.be.true;
-      expect(isDid.test(verified.payload.challengerDid)).to.be.true;
+      const {
+        agentAuthReqURL,
+        requesterDID,
+        agentDID,
+        agentSigningKeys,
+        verifiedRequest,
+      } = generateVerifiedRequest();
+
+      const  {
+        did: verifierDid,
+        signingKeys: verifierKeys,
+      } = generateActor();
+
+      const challenge = auth.createChallenge(
+        verifiedRequest,
+        verifierKeys,
+        verifierDid,
+      );
+
+      expect(challenge).to.be.aJWT();
+      const result = jwt.verifyEdDsa(challenge);
+
+      expect(result).to.matchPattern({
+        signed: _.isString,
+        signature: _.isString,
+        header: {
+          alg: 'EdDSA',
+          typ: 'JWT',
+          jwk: {
+            kty: 'OKP',
+            crv: 'Ed25519',
+            x: verifierKeys.signingPublicKey,
+            kid: verifierDid,
+          },
+        },
+        payload: {
+          agentAuthReqURL,
+          agentDID,
+          requesterDID,
+          iat: _.isIAT,
+          authId: _.isAuthId,
+          agentPublicKey: agentSigningKeys.signingPublicKey,
+          challenge: _.isNonce,
+          challengeIat: _.isIAT,
+          challengerDid: verifierDid,
+        },
+      });
     });
   });
 
@@ -44,10 +68,12 @@ describe('create challenge', function() {
     });
   });
 
-  context('when given invalid public key', function(){
+  context('when given an invalid public key', function(){
     it('should throw error', function(){
       expect(() => {
-        auth.createChallenge(verifiedRequest);
+        auth.createChallenge({
+          verifierKeys: {},
+        });
       }).to.throw('verifier public key is required');
     });
   });
@@ -55,7 +81,12 @@ describe('create challenge', function() {
   context('when given invalid private key', function(){
     it('should throw error', function(){
       expect(() => {
-        auth.createChallenge(verifiedRequest, {signingPublicKey: 'XJVzCMAArF4YAhHLQgOv58TLxxDS2IFi-8iNfrxYsZQ'});
+        auth.createChallenge(
+          {},
+          {
+            signingPublicKey: 'XJVzCMAArF4YAhHLQgOv58TLxxDS2IFi-8iNfrxYsZQ'
+          },
+        );
       }).to.throw('verifier private key is required');
     });
   });
@@ -63,10 +94,15 @@ describe('create challenge', function() {
   context('when given no verifier DID', function(){
     it('should throw error', function(){
       expect(() => {
-        auth.createChallenge(verifiedRequest, verifierKeys);
+        auth.createChallenge(
+          {},
+          {
+            signingPublicKey: 'y',
+            signingPrivateKey: 'x',
+          },
+        );
       }).to.throw('verifier DID is required');
     });
   });
-
 
 });

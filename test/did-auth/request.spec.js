@@ -1,48 +1,63 @@
 'use strict';
 
-const auth = require('jlinc-did-auth');
 const jwt = require('jlinc-jwt');
-const isJWT = /^[\w-]+\.[\w-]+\.[\w-]+$/;
-const isTimestamp = /^[\d]{10,13}$/; //with or without milliseconds
-const isUUID = /^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[a-f0-9]{4}-[a-f0-9]{12}$/; //v4 UUID
-const validReqObject = {
-  agentAuthReqURL: 'http://localhost:8080',
-  agentDID: 'did:jlinc:mY5q2_qiJaaoQDMTdLj56tkP52iUxXg0pSb8u-S1iA0',
-  agentSigningKeys: {signingPublicKey: 'mY5q2_qiJaaoQDMTdLj56tkP52iUxXg0pSb8u-S1iA0',
-    signingPrivateKey: 'atlovbiCQUWv5lHkRohXluNvP69z6GXZ4dvAfBeTLUuZjmrb-qIlpqhAMxN0uPnq2Q_naJTFeDSlJvy75LWIDQ'},
-  requesterDID: 'did:jlinc:iC2FSXaxH8HmK8sA0O6G3ZBVXpwb3IA_XfrYQDwnGE8'
-};
+const { generateRequest } = require('../helpers');
+const auth = require('../../');
 
 describe('request', function() {
 
+  let request;
+  beforeEach(function() {
+    ({ request } = generateRequest());
+  });
+
   context('when given a valid reqObject', function(){
-    const result = auth.request(validReqObject);
     it('should return a verifiable JWT', function(){
-      expect(isJWT.test(result)).to.be.true;
-      const verified = jwt.verifyEdDsa(result);
-      expect(verified).to.be.an('object');
-      expect(Object.keys(verified.payload)).to.have.lengthOf(5);
-      expect(isTimestamp.test(verified.payload.iat)).to.be.true;
-      expect(isUUID.test(verified.payload.authId)).to.be.true;
+      const resultJWT = auth.request(request);
+      expect(resultJWT).to.be.aJWT();
+      const result = jwt.verifyEdDsa(resultJWT);
+      expect(result).to.matchPattern({
+        signed: _.isString,
+        signature: _.isString,
+        header: {
+          alg: 'EdDSA',
+          typ: 'JWT',
+          jwk: {
+            kty: 'OKP',
+            crv: 'Ed25519',
+            x: request.agentSigningKeys.signingPublicKey,
+            kid: request.agentDID,
+          },
+        },
+        payload: {
+          agentAuthReqURL: request.agentAuthReqURL,
+          agentDID: request.agentDID,
+          requesterDID: request.requesterDID,
+          iat: _.isIAT,
+          authId: _.isUUIDv4,
+        },
+      });
     });
   });
 
   context('when given an invalid agent DID', function(){
     it('should throw error', function(){
-      const invalidAgentDid = Object.assign({}, validReqObject);
-      invalidAgentDid.agentDID = 'not:a:DID';
       expect(() => {
-        auth.request(invalidAgentDid);
+        auth.request({
+          ...request,
+          agentDID: 'not:a:DID',
+        });
       }).to.throw('RequestError: agentDID not a valid DID');
     });
   });
 
   context('when given an invalid requester DID', function(){
     it('should throw error', function(){
-      const invalidRequesterDid = Object.assign({}, validReqObject);
-      invalidRequesterDid.requesterDID = 'not:a:DID';
       expect(() => {
-        auth.request(invalidRequesterDid);
+        auth.request({
+          ...request,
+          requesterDID: 'not:a:DID',
+        });
       }).to.throw('RequestError: requesterDID not a valid DID');
     });
   });
