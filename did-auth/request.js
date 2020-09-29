@@ -1,6 +1,6 @@
 'use strict';
 
-const jlincJwt = require('jlinc-jwt');
+const jlincJwt = require('@jlinc/jwt');
 const uuid = require('uuid');
 
 module.exports = function request(reqObject){

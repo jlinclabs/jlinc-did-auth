@@ -1,6 +1,6 @@
 'use strict';
 
-const jlincJwt = require('jlinc-jwt');
+const jlincJwt = require('@jlinc/jwt');
 const sodium = require('sodium').api;
 const b64 = require('urlsafe-base64');
 

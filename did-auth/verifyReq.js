@@ -1,6 +1,6 @@
 'use strict';
 
-const jlincJwt = require('jlinc-jwt');
+const jlincJwt = require('@jlinc/jwt');
 const DID_FORMAT = /^did:[a-z]+:[\w-]+$/;
 
 module.exports = function verifyReq(reqJWS){

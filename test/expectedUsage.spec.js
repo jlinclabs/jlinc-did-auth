@@ -1,7 +1,7 @@
 'use strict';
 
 const auth = require('../');
-// const auth = require('jlinc-did-auth');
+// const auth = require('@jlinc/did-auth');
 
 const { generateActor } = require('./helpers');
 

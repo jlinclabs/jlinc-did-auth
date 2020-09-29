@@ -1,6 +1,6 @@
 'use strict';
 
-const jlincJwt = require('jlinc-jwt');
+const jlincJwt = require('@jlinc/jwt');
 
 module.exports = function verifyChallengeSignature(signedChallengeJWS){
   const { JlincDidAuthError } = this;

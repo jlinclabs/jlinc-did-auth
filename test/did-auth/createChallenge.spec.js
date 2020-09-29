@@ -1,6 +1,6 @@
 'use strict';
 
-const jwt = require('jlinc-jwt');
+const jwt = require('@jlinc/jwt');
 const {
   generateVerifiedRequest,
   generateActor,
