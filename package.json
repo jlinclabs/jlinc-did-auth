@@ -1,6 +1,6 @@
 {
   "name": "@jlinc/did-auth",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Authorization using JLINC DIDs",
   "main": "./did-auth",
   "scripts": {
