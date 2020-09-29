@@ -3,8 +3,7 @@
 const jlincJwt = require('jlinc-jwt');
 const uuid = require('uuid');
 
-module.exports = function(reqObject){
-  const stack = (new Error).stack;
+module.exports = function request(reqObject){
   const { JlincDidAuthError } = this;
 
   if (!reqObject) throw new Error(`request object is required`);
@@ -15,20 +14,11 @@ module.exports = function(reqObject){
 
   const didRegex = /^did:[a-z]+:[\w\-]+$/;
 
-  if (
-    !didRegex.test(reqObject.agentDID)
-  ) {
-    const error = new JlincDidAuthError("RequestError: agentDID not a valid DID");
-    error.stack += stack;
-    throw error;
-  }
-  if (
-    !didRegex.test(reqObject.requesterDID)
-  ) {
-    const error = new JlincDidAuthError("RequestError: requesterDID not a valid DID");
-    error.stack += stack;
-    throw error;
-  }
+  if (!didRegex.test(reqObject.agentDID))
+    throw new JlincDidAuthError("RequestError: agentDID not a valid DID");
+
+  if (!didRegex.test(reqObject.requesterDID))
+    throw new JlincDidAuthError("RequestError: requesterDID not a valid DID");
 
   const authRequest = {};
   authRequest.agentAuthReqURL = reqObject.agentAuthReqURL;
@@ -37,7 +27,12 @@ module.exports = function(reqObject){
   authRequest.iat = Date.now();
   authRequest.authId = uuid.v4();
 
-  const authReqJws = jlincJwt.signEdDsa(authRequest, reqObject.agentSigningKeys.signingPublicKey, reqObject.agentSigningKeys.signingPrivateKey, reqObject.agentDID);
+  const authReqJws = jlincJwt.signEdDsa(
+    authRequest,
+    reqObject.agentSigningKeys.signingPublicKey,
+    reqObject.agentSigningKeys.signingPrivateKey,
+    reqObject.agentDID,
+  );
 
   return authReqJws;
 };

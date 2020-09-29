@@ -2,7 +2,7 @@
 
 const jlincJwt = require('jlinc-jwt');
 
-module.exports = function(signedChallengeJWS){
+module.exports = function verifyChallengeSignature(signedChallengeJWS){
   const { JlincDidAuthError } = this;
 
   let signedChallengeObj;
