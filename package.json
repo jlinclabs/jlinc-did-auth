@@ -31,14 +31,17 @@
     "sinon": "^7.2.2",
     "sinon-chai": "^3.3.0"
   },
+  "directories": [
+    "did-auth"
+  ],
   "files": [
-    "./did-auth/index.js",
-    "./did-auth/verifyReq.js",
-    "./did-auth/createChallenge.js",
-    "./did-auth/verifyChallengeSignature.js",
-    "./did-auth/verifyChallenge.js",
-    "./did-auth/request.js",
-    "./did-auth/signChallenge.js",
-    "./did-auth/createNonce.js"
+    "did-auth/index.js",
+    "did-auth/verifyReq.js",
+    "did-auth/createChallenge.js",
+    "did-auth/verifyChallengeSignature.js",
+    "did-auth/verifyChallenge.js",
+    "did-auth/request.js",
+    "did-auth/signChallenge.js",
+    "did-auth/createNonce.js"
   ]
 }
