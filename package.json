@@ -2,7 +2,7 @@
   "name": "jlinc-did-auth",
   "version": "1.0.0",
   "description": "Authorization using JLINC DIDs",
-  "main": "./did-auth/index.js",
+  "main": "./did-auth",
   "scripts": {
     "test": "./scripts/test"
   },
