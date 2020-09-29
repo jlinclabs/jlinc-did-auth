@@ -1,11 +1,12 @@
 'use strict';
 
+const version = require('../../package.json').version;
 const auth = require('../../');
 
 describe('did-auth', function() {
   it('should match this pattern', function(){
     expect(auth).to.matchPattern({
-      version: '1.0.0',
+      version,
       JlincDidAuthError: _.isFunction,
       createNonce: _.isFunction,
       request: _.isFunction,
